@@ -4,25 +4,25 @@ console.log('Script perfilUsuario.js carregado com sucesso'); // Log inicial
 
 // console.log('clientService importado:', clientService); // Removido
 
-const defineIdGeral = () => {
-  const verificarID = new URL(window.location);
-  const id = verificarID.searchParams.get('id');
-  console.log('ID extraído da URL:', id); // Log do ID
-  return id;
-};
+// const defineIdGeral = () => { // Temporariamente comentado, ID será do token
+//   const verificarID = new URL(window.location);
+//   const id = verificarID.searchParams.get('id');
+//   console.log('ID extraído da URL:', id); 
+//   return id;
+// };
 
-const verificaTipoUsuario = () => {
+const verificaTipoUsuario = () => { // Esta função pode ser simplificada ou integrada em exibeDados
   const token = localStorage.getItem('token');
-  console.log('Token encontrado no localStorage:', token); // Log do token
+  // console.log('Token encontrado no localStorage:', token); 
   if (!token) {
-    console.log('Token não encontrado, redirecionando para login.html');
+    // console.log('Token não encontrado, redirecionando para login.html');
     window.location.href = 'login.html';
     return null;
   }
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
-    console.log('Payload do token:', payload); // Log do payload
-    return payload.tipo;
+    // console.log('Payload do token:', payload); 
+    return payload; // Retorna todo o payload para ter acesso ao ID e tipo
   } catch (erro) {
     console.error('Erro ao decodificar token:', erro);
     window.location.href = 'login.html';
@@ -181,42 +181,46 @@ function updateTwoFactorUI(isTwoFactorEnabled, qrCodeDataUrl = null) {
   }
 }
 
-
-const id = defineIdGeral();
-const formulario = document.querySelector('[data-formPerfil]');
-console.log('Formulário encontrado:', formulario);
+// const id = defineIdGeral(); // ID será obtido do token dentro de exibeDados
+// const formulario = document.querySelector('[data-formPerfil]'); // Movido para dentro de exibeDados
+// console.log('Formulário encontrado:', formulario); // Removido ou movido
 
 const exibeDados = async () => {
   try {
-    const tipo = verificaTipoUsuario();
-    console.log('Tipo de usuário:', tipo);
-    if (!tipo) return;
-
-    if (window.location.pathname.includes('admin.html') && tipo !== 'admin') {
-      console.log('Usuário não é admin, redirecionando para perfil.html');
-      window.location.href = 'perfil.html';
-      return;
-    }
-
-    if (!id) {
-      console.error('ID do usuário não encontrado na URL');
-      alert('ID do usuário não encontrado. Verifique o link ou tente novamente.');
-      return;
-    }
-    console.log('Buscando perfil do usuário com ID:', id);
-    
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Sessão não encontrada. Faça login novamente.');
+    const tokenData = verificaTipoUsuario(); // Agora retorna o payload ou null
+    if (!tokenData || !tokenData.id || !tokenData.tipo) {
+      console.error('Dados do token inválidos ou não encontrados. Redirecionando para login.');
       window.location.href = 'login.html';
       return;
     }
+    const userIdFromToken = tokenData.id;
+    const userTypeFromToken = tokenData.tipo;
 
-    const response = await fetch(`/perfil/${id}`, { // Modificado para usar fetch
+    // console.log('ID do usuário (do token):', userIdFromToken);
+    // console.log('Tipo de usuário (do token):', userTypeFromToken);
+
+    if (window.location.pathname.includes('admin.html') && userTypeFromToken !== 'admin') {
+      // console.log('Usuário não é admin, redirecionando para perfil.html');
+      window.location.href = 'perfil.html'; // Ou uma página de "não autorizado"
+      return;
+    }
+    
+    // O token já foi verificado em verificaTipoUsuario, mas pegamos ele de novo para a requisição
+    const token = localStorage.getItem('token'); 
+    // A verificação de !token já está em verificaTipoUsuario, mas uma dupla checagem não prejudica.
+    if (!token) { 
+      // console.log('Token não encontrado (redundante), redirecionando para login.html');
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    // console.log('Buscando perfil do usuário com ID do token:', userIdFromToken);
+
+    const response = await fetch(`/perfil/${userIdFromToken}`, { 
       method: 'GET',
       headers: {
-        'Authorization': token,
-        'Content-Type': 'application/json' 
+        'Authorization': token, 
+        'Content-Type': 'application/json'
       }
     });
 
@@ -225,26 +229,32 @@ const exibeDados = async () => {
       console.error('Falha ao buscar perfil:', response.status, errorData);
       alert(`Erro ao buscar dados do perfil: ${errorData.error || response.statusText}`);
       if (response.status === 401 || response.status === 403) {
-        window.location.href = 'login.html'; // Redireciona se não autorizado
+        window.location.href = 'login.html';
       }
       return;
     }
 
     const usuario = await response.json();
-    console.log('Usuário retornado via fetch:', usuario);
+    // console.log('Usuário retornado via fetch:', usuario);
     if (!usuario) {
       console.error('Dados do usuário não encontrados na resposta.');
       alert('Dados do usuário não encontrados.');
-      return; 
+      return;
     }
-
-    // Passa o objeto usuario inteiro para mostraDados
-    const perfilDiv = mostraDados(usuario); 
-    console.log('Perfil div criado:', perfilDiv);
     
-    // Limpa o formulário antes de adicionar novos elementos, caso haja recarregamento de dados
+    const formulario = document.querySelector('[data-formPerfil]');
+    if (!formulario) {
+      console.error('Elemento [data-formPerfil] não encontrado no DOM! Verifique o HTML.');
+      alert('Erro na configuração da página: container do perfil não encontrado.');
+      return;
+    }
+    // console.log('Elemento [data-formPerfil] encontrado:', formulario);
+
+    const perfilDiv = mostraDados(usuario);
+    // console.log('Perfil div criado:', perfilDiv);
+    
     while (formulario.firstChild) {
-        formulario.removeChild(formulario.firstChild);
+      formulario.removeChild(formulario.firstChild);
     }
     formulario.appendChild(perfilDiv);
 
