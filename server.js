@@ -150,6 +150,22 @@ app.post('/enable-two-factor', verifyToken, async (req, res) => {
   }
 });
 
+// Rota para desativar 2FA
+app.post('/disable-two-factor', verifyToken, async (req, res) => {
+  try {
+    const result = await clientService.disableTwoFactorAuthentication(req.userId);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('Erro ao desabilitar 2FA:', err);
+    // Check if the error has a structured message from clientService
+    if (err.error && err.error.message) {
+      res.status(500).json({ error: err.error.message });
+    } else {
+      res.status(500).json({ error: 'Erro interno ao desabilitar autenticação de dois fatores.' });
+    }
+  }
+});
+
 // Rota para buscar perfil do usuário
 app.get('/perfil/:id', verifyToken, async (req, res) => {
   try {

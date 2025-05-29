@@ -15,7 +15,7 @@ if (!SECRET_KEY) {
 
 const clientService = {
   async perfilUsuario(id) {
-    const [rows] = await connection.execute('SELECT * FROM Usuarios WHERE id = ?', [id]);
+    const [rows] = await connection.execute('SELECT id, nome, email, tipo, twoFactorEnabled, twoFactorSecret FROM Usuarios WHERE id = ?', [id]);
     return rows[0] || null;
   },
 
@@ -125,6 +125,24 @@ const clientService = {
       [usuario.nome, usuario.telefone || null, usuario.cidade || null, usuario.sobre || null, usuario.id]
     );
     return usuario;
+  },
+
+  async disableTwoFactorAuthentication(userId) {
+    try {
+      await connection.execute(
+        'UPDATE Usuarios SET twoFactorEnabled = FALSE, twoFactorSecret = NULL WHERE id = ?',
+        [userId]
+      );
+      // Optionally, log this action
+      await connection.execute(
+        'INSERT INTO AuditLogs (userId, action) VALUES (?, ?)',
+        [userId, 'disable_two_factor']
+      );
+      return { success: true, message: 'Autenticação de dois fatores desabilitada com sucesso.' };
+    } catch (err) {
+      console.error('Erro ao desabilitar autenticação de dois fatores:', err.message);
+      throw { error: { field: 'general', message: 'Erro ao desabilitar autenticação de dois fatores: ' + err.message } };
+    }
   }
 };
 
