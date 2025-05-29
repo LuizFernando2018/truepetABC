@@ -1,8 +1,8 @@
 console.log('Script perfilUsuario.js carregado com sucesso'); // Log inicial
 
-import { clientService } from "../controllerLogin.js";
+// import { clientService } from "../controllerLogin.js"; // Removido - clientService não será usado
 
-console.log('clientService importado:', clientService); // Log para verificar o import
+// console.log('clientService importado:', clientService); // Removido
 
 const defineIdGeral = () => {
   const verificarID = new URL(window.location);
@@ -205,13 +205,37 @@ const exibeDados = async () => {
     }
     console.log('Buscando perfil do usuário com ID:', id);
     
-    // clientService.perfilUsuario agora retorna o usuário completo, incluindo twoFactorEnabled
-    const usuario = await clientService.perfilUsuario(id);
-    console.log('Usuário retornado:', usuario);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Sessão não encontrada. Faça login novamente.');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    const response = await fetch(`/perfil/${id}`, { // Modificado para usar fetch
+      method: 'GET',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json' 
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Erro ao buscar perfil, resposta não JSON.' }));
+      console.error('Falha ao buscar perfil:', response.status, errorData);
+      alert(`Erro ao buscar dados do perfil: ${errorData.error || response.statusText}`);
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = 'login.html'; // Redireciona se não autorizado
+      }
+      return;
+    }
+
+    const usuario = await response.json();
+    console.log('Usuário retornado via fetch:', usuario);
     if (!usuario) {
-      console.error('Usuário não encontrado no sistema.');
-      alert('Usuário não encontrado.');
-      return; // Sai da função se o usuário não for encontrado
+      console.error('Dados do usuário não encontrados na resposta.');
+      alert('Dados do usuário não encontrados.');
+      return; 
     }
 
     // Passa o objeto usuario inteiro para mostraDados
@@ -235,16 +259,25 @@ const exibeDados = async () => {
     if (error.message) {
       errorMessage += ` Detalhes: ${error.message}`;
     }
-    if (error.response && typeof error.response.json === 'function') {
-      error.response.json().then(jsonError => {
+    // Este bloco de erro é para o try/catch geral de exibeDados
+    // Erros de fetch específicos são tratados acima
+    if (error.message.includes('Failed to fetch')) {
+         errorMessage = 'Erro de conexão. Verifique sua internet ou o servidor pode estar indisponível.';
+    } else if (error.response && typeof error.response.json === 'function') { // Verifica se error.response existe
+      // Este bloco pode não ser alcançado se o fetch falhar antes de obter uma resposta (ex: rede)
+      // Os erros de resposta HTTP (4xx, 5xx) já são tratados dentro do bloco do fetch.
+      // Este local seria mais para erros de processamento JS após um fetch bem-sucedido (improvável aqui)
+      // ou se o objeto error tiver uma propriedade 'response' por algum motivo.
+      try {
+        const jsonError = await error.response.json();
         errorMessage += ` Server: ${jsonError.error || JSON.stringify(jsonError)}`;
-        alert(errorMessage);
-      }).catch(() => alert(errorMessage));
-    } else {
-      alert(errorMessage);
+      } catch (e) {
+        // Não conseguiu parsear o JSON do erro, usa a mensagem original
+      }
     }
+    alert(errorMessage); // Exibe a mensagem de erro construída
     // Opcional: redirecionar para uma página de erro ou login
-    // window.location.href = 'login.html'; 
+    // window.location.href = 'login.html';
   }
 };
 
