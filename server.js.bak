@@ -1,0 +1,255 @@
+import express from 'express';
+import cors from 'cors';
+import { clientService } from './controllerLogin.js';
+import { mensagemService } from './controllerMensagem.js';
+import { animalService } from './animalService.js';
+import { connection } from './db.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+
+// Middleware para parsing de JSON
+app.use(express.json());
+
+// Configuração do CORS
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://127.0.0.1:5500'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'user-id'],
+  exposedHeaders: ['user-id'],
+  credentials: false
+}));
+
+// Servir arquivos estáticos da pasta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Middleware para verificar se o usuário é admin
+const isAdmin = async (req, res, next) => {
+  const userId = req.headers['user-id'];
+  if (!userId) {
+    return res.status(401).json({ error: 'Usuário não autenticado' });
+  }
+
+  try {
+    const [rows] = await (await connection).execute('SELECT tipo FROM Usuarios WHERE id = ?', [userId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    if (rows[0].tipo !== 'admin') {
+      return res.status(403).json({ error: 'Acesso negado. Apenas administradores podem realizar esta ação' });
+    }
+    req.userId = userId;
+    next();
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao verificar permissões' });
+  }
+};
+
+// Rota para listar animais disponíveis (para usuários comuns)
+app.get('/animais', async (req, res) => {
+  try {
+    const animais = await animalService.listarAnimaisDisponiveis();
+    res.status(200).json(animais);
+  } catch (erro) {
+    console.error('Erro ao listar animais:', erro);
+    res.status(500).json({ erro: 'Erro ao listar animais' });
+  }
+});
+
+// Rota para listar todos os animais (para admins)
+app.get('/animais/admin', isAdmin, async (req, res) => {
+  try {
+    const [rows] = await (await connection).execute('SELECT * FROM Animais');
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error('Erro ao listar animais para admin:', err);
+    res.status(500).json({ error: 'Erro ao listar animais' });
+  }
+});
+
+// Rota para cadastrar animal
+app.post('/animais', isAdmin, async (req, res) => {
+  try {
+    const { nome, especie, idade, descricao, status } = req.body;
+
+    if (!nome || !especie) {
+      return res.status(400).json({ error: 'Nome e espécie são obrigatórios' });
+    }
+
+    const [result] = await (await connection).execute(
+      'INSERT INTO Animais (nome, especie, idade, descricao, status, id_responsavel) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        nome,
+        especie,
+        idade || null,
+        descricao || null,
+        status || 'disponivel',
+        req.userId
+      ]
+    );
+    res.status(201).json({
+      id: result.insertId,
+      nome,
+      especie,
+      idade,
+      descricao,
+      status: status || 'disponivel',
+      id_responsavel: req.userId
+    });
+  } catch (err) {
+    console.error('Erro ao cadastrar animal:', err);
+    res.status(500).json({ error: 'Erro ao cadastrar animal' });
+  }
+});
+
+// Rota para buscar animal por ID
+app.get('/animais/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const [rows] = await (await connection).execute('SELECT * FROM Animais WHERE id = ?', [id]);
+    if (rows.length > 0) {
+      res.status(200).json(rows[0]);
+    } else {
+      res.status(404).json({ error: 'Animal não encontrado' });
+    }
+  } catch (err) {
+    console.error('Erro ao buscar animal:', err);
+    res.status(500).json({ error: 'Erro ao buscar animal' });
+  }
+});
+
+// Rota para atualizar animal
+app.put('/animais/:id', isAdmin, async (req, res) => {
+  const id = req.params.id;
+  const { nome, especie, idade, descricao, status } = req.body;
+
+  try {
+    const [rows] = await (await connection).execute('SELECT * FROM Animais WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Animal não encontrado' });
+    }
+
+    const [result] = await (await connection).execute(
+      'UPDATE Animais SET nome = ?, especie = ?, idade = ?, descricao = ?, status = ? WHERE id = ?',
+      [
+        nome || rows[0].nome,
+        especie || rows[0].especie,
+        idade || rows[0].idade,
+        descricao || rows[0].descricao,
+        status || rows[0].status,
+        id
+      ]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(500).json({ error: 'Erro ao atualizar animal' });
+    }
+
+    res.status(200).json({
+      id,
+      nome: nome || rows[0].nome,
+      especie: especie || rows[0].especie,
+      idade: idade || rows[0].idade,
+      descricao: descricao || rows[0].descricao,
+      status: status || rows[0].status
+    });
+  } catch (err) {
+    console.error('Erro ao atualizar animal:', err);
+    res.status(500).json({ error: 'Erro ao atualizar animal' });
+  }
+});
+
+// Rota para deletar animal
+app.delete('/animais/:id', isAdmin, async (req, res) => {
+  const id = req.params.id;
+  try {
+    const [rows] = await (await connection).execute('SELECT * FROM Animais WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Animal não encontrado' });
+    }
+
+    const [result] = await (await connection).execute('DELETE FROM Animais WHERE id = ?', [id]);
+    if (result.affectedRows === 0) {
+      return res.status(500).json({ error: 'Erro ao deletar animal' });
+    }
+
+    res.status(200).json({ message: 'Animal deletado com sucesso' });
+  } catch (err) {
+    console.error('Erro ao deletar animal:', err);
+    res.status(500).json({ error: 'Erro ao deletar animal' });
+  }
+});
+
+// Rota de cadastro de usuário
+app.post('/cadastro', async (req, res) => {
+  try {
+    const { nome, email, senha } = req.body;
+    const novoUsuario = await clientService.criarUsuario(nome, email, senha);
+    res.status(201).json(novoUsuario);
+  } catch (erro) {
+    res.status(400).json({ erro: 'Erro ao criar usuário' });
+  }
+});
+
+// Rota de listar usuários
+app.get('/usuarios', async (req, res) => {
+  try {
+    const usuarios = await clientService.logarUsuario();
+    res.status(200).json(usuarios);
+  } catch (erro) {
+    res.status(500).json({ erro: 'Erro ao buscar usuários' });
+  }
+});
+
+// Rota de envio de mensagem
+app.post('/mensagem', async (req, res) => {
+  try {
+    const { nome, telefone, animal, mensagem, animal_id } = req.body;
+    const novaMensagem = await mensagemService.enviarMensagem(nome, telefone, animal, mensagem, animal_id);
+    res.status(201).json(novaMensagem);
+  } catch (erro) {
+    res.status(400).json({ erro: 'Erro ao enviar mensagem' });
+  }
+});
+
+// Rota para buscar mensagens do responsável
+app.get('/mensagens/responsavel/:responsavelId', async (req, res) => {
+  const responsavelId = req.params.responsavelId;
+  try {
+    const mensagens = await mensagemService.buscarMensagensPorResponsavel(responsavelId);
+    res.status(200).json(mensagens);
+  } catch (erro) {
+    console.error('Erro ao buscar mensagens do responsável:', erro);
+    res.status(500).json({ erro: 'Erro ao buscar mensagens' });
+  }
+});
+
+// Rota de login
+app.post('/login', async (req, res) => {
+  try {
+    const { email, senha } = req.body;
+    const [rows] = await (await connection).execute(
+      'SELECT * FROM Usuarios WHERE email = ? AND senha = ?',
+      [email, senha]
+    );
+    if (rows.length > 0) {
+      res.status(200).json({ id: rows[0].id });
+    } else {
+      res.status(401).json({ error: 'Email ou senha incorretos' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao fazer login' });
+  }
+});
+
+// Rota padrão para 404
+app.use((req, res) => {
+  res.status(404).send('Rota não encontrada');
+});
+
+// Iniciar servidor
+app.listen(3000, () => console.log('Rodando na porta 3000'));

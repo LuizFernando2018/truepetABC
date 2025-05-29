@@ -1,0 +1,65 @@
+.login {
+    background:#FFF9C4; /* Amarelo pastel */
+    text-align: center;
+
+    .cadastro__texto {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centraliza o conteúdo horizontalmente */
+        justify-content: center;
+        text-align: center; /* Alinha o texto ao centro */
+    }
+    
+    .cadastro__logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row; /* Alinha o conteúdo na horizontal (lado a lado) */
+        margin-bottom: 20px; /* Adiciona espaço entre o logo e a frase de login */
+    }
+    
+    .inicio__logo-texto {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #1E3A8A; /* Cor azul para o texto (Tom de azul escuro) */
+        margin-right: 8px; /* Espaçamento entre o texto e a patinha */
+    }
+    
+    .inicio__logo-patinha {
+        font-size: 2rem; /* Tamanho da patinha */
+        color: #1E3A8A; /* Cor azul para a patinha */
+    }
+    
+    .login__texto {
+        font-size: 1rem;
+        color: #555; /* Cor cinza para o texto */
+        margin-bottom: 10px; /* Reduz o espaço abaixo da frase */
+    }
+    
+    .login__email {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px; /* Ajusta o espaço abaixo do campo de e-mail */
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    
+        /* Estilo para o checkbox */
+    .login__formulario label input[type="checkbox"] {
+    margin-right: 5px; /* Espaçamento entre o checkbox e o texto */
+    }
+
+    /* Estilo para o link "Cadastre-se" dentro de login__texto */
+    .login__texto a {
+    color: #1E3A8A; /* Mesma cor azul escura do logo */
+    text-decoration: none;
+    }
+
+    .login__texto a:hover {
+    text-decoration: underline;
+    }
+
+   
+
+}

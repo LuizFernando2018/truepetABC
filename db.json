@@ -1,0 +1,40 @@
+{
+  "Usuario": [
+    {
+      "nome": "Alan do carmo abilio",
+      "email": "alan.abilio@gmail.com",
+      "senha": "Senha1234!",
+      "id": 1,
+      "telefone": "1140028922",
+      "cidade": "Sao Paulo",
+      "sobre": ""
+    },
+    {
+      "nome": "Raquel",
+      "email": "raquel@gmail.com",
+      "senha": "Senha@123",
+      "id": 2
+    },
+    {
+      "nome": "Leo",
+      "email": "leo@gmail.com",
+      "senha": "Senha@123",
+      "id": 3
+    },
+    {
+      "nome": "Breno",
+      "email": "breno@gmail.com",
+      "senha": "Senha1234!",
+      "id": 4
+    },
+    {
+      "nome": "Luiz Fernandes",
+      "email": "luiz@email.com",
+      "senha": "Senha@123",
+      "id": 5,
+      "telefone": "",
+      "cidade": "",
+      "sobre": ""
+    }
+  ]
+}

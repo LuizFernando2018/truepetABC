@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animais - Adopet</title>
+    <link rel="stylesheet" href="./assets/css/normalize.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="animais">
+    <div id="acessibilidade"></div>
+    <header>
+        <div class="forma__topo"></div>
+        <div class="forma__lateral esquerda"></div>
+        <nav class="cabecalho container__cabecalho">
+            <ul class="cabecalho__menu" id="logado">
+                <li class="cabecalho__menu--item menu--logo" id="logo"></li>
+                <li class="cabecalho__menu--item"><a href="./animais.html" aria-label="Ir para Home"><img src="./assets/img/Casa.svg" alt="Home"></a></li>
+                <li class="cabecalho__menu--item"><a href="./mensagem.html" aria-label="Enviar Mensagens"></a></li>
+                <li class="cabecalho__menu--item"><a href="./mensagensResponsavel.html" aria-label="Ver Mensagens Recebidas"><img src="./assets/img/MensagensRecebidas.svg" alt="Mensagens Recebidas"></a></li>
+                <li class="cabecalho__menu--item" id="perfil"><a href="./perfil.html" aria-label="Ir para Perfil"><img src="./assets/img/user.png" alt="Perfil" class="cabecalho__menu--itemUser"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="conteudo__animais">
+        <section class="animais__container container">
+            <h1 class="animais__titulo">Oi! Veja os amigos disponíveis para adoção!</h1>
+            <ul class="animais__lista">
+                <!-- Os itens serão adicionados dinamicamente -->
+            </ul>
+        </section>
+    </main>
+    <footer class="rodape">
+        <p>2025 - Desenvolvido por acadêmicos do curso de Análise e Desenvolvimento de Sistemas.</p>
+    </footer>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="./js/Animais/listarAnimais.js" type="module"></script>
+    <script src="https://accessibility-widget.pages.dev/script.js" defer></script>
+</body>
+</html>

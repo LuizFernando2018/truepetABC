@@ -1,0 +1,7 @@
+.login__formulario {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-family: var(--Poppins);
+        margin-bottom: 19rem;
+}

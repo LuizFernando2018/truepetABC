@@ -1,0 +1,50 @@
+.inicio__texto {
+    text-align: center;
+    font-family: var(--Poppins);
+    font-weight: 400;
+    margin: auto;
+}
+
+@media screen and (min-width: 0px) {
+    .inicio__texto {
+        width: 250px;
+        line-height: 24px;
+        margin-bottom: 1rem;
+
+    }
+    .inicio__texto#tablet{
+        display: none;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .inicio__texto {
+        width: 350px;
+        font-size: 18px;
+        line-height: 26px;
+    }
+    .inicio__texto#mobile{
+        display: none;
+    }
+    .inicio__texto#tablet{
+        display: flex;
+    }
+    .inicio__texto#desktop {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .inicio__texto {
+        width: 448px;
+    }
+    .inicio__texto#mobile{
+        display: none;
+    }
+    .inicio__texto#tablet{
+        display: none;
+    }
+    .inicio__texto#desktop {
+        display: flex;
+    }
+}

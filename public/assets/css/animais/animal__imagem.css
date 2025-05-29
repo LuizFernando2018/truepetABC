@@ -1,0 +1,5 @@
+.animal__imagem {
+    text-align: center;
+    width: 148px;
+    grid-area: imagem;
+}

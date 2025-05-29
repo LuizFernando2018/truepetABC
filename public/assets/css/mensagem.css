@@ -1,0 +1,5 @@
+.mensagem {
+    font-family: var(--Poppins);
+    color: #5D7094; /* Azul pastel mais suave */
+    text-align: center;
+}

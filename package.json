@@ -1,0 +1,39 @@
+{
+  "name": "adopet",
+  "version": "1.0.0",
+  "description": "Projeto Adopet",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alan004/adopet.git"
+  },
+  "keywords": [
+    "adopet",
+    "alura",
+    "challenge"
+  ],
+  "author": "alan004",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1",
+    "json-server": "^0.16.3",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.0",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/alan004/adopet/issues"
+  },
+  "homepage": "https://github.com/alan004/adopet#readme"
+}

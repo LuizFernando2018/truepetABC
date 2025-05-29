@@ -1,0 +1,20 @@
+.ilustracao {
+    z-index: -1;
+    bottom: calc(0px -25px);
+    margin-bottom: -1.5rem;
+    display: block;
+    margin-top: 1rem;
+}
+
+@media screen and (min-width: 0px) {
+    .ilustracao{
+        margin-left: 2rem;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .ilustracao{
+        margin-left: 0;
+        text-align: center;
+    }
+}

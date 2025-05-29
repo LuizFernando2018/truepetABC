@@ -1,0 +1,9 @@
+.animal__mensagem {
+    margin-top: .5rem;
+    font-size: 10px;
+    background-image: url(../../img/ícone_mensagem.svg);
+    background-repeat: no-repeat;
+    background-position-x: left;
+    background-position-y: center;
+    background-origin: content-box;
+}

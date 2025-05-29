@@ -1,0 +1,4 @@
+.animal__descricao {
+    display: flex;
+    flex-direction: column;
+}

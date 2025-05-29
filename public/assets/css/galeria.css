@@ -1,0 +1,27 @@
+.galeria{
+    display: flex;
+    flex-wrap: wrap;
+    font-family: var(--Poppins);
+    color: var(--cinza-escuro);
+    margin-bottom: 1.5rem;
+}
+
+@media screen and (min-width: 0px) {
+    .galeria{
+        flex-direction: column;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .galeria {
+        margin: 0 2rem;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .galeria {
+        margin: 0 10rem;
+    }
+}

@@ -1,0 +1,16 @@
+.rodape {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #A4E1D4; /* Verde pastel */
+    color: #555; /* Cor do texto ajustada para melhor contraste */
+    font-family: var(--Poppins);
+    padding: 0.3rem; /* Altura reduzida */
+    z-index: 1;
+    max-height: 30px; /* Ajuste da altura */
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 0.85rem; /* Tamanho da fonte reduzido */
+    border-top: 2px solid #EADCA6; /* Borda sutil para destacar o rodapé */
+}

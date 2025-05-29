@@ -1,0 +1,26 @@
+.formulario__loggedout--input {
+    background-color: var(--cinza-claro);
+    text-align: center;
+}
+
+.formulario__loggedout--input:nth-child(8) {
+    margin-bottom: 0;
+}
+
+@media screen and (min-width: 0px) {
+    .formulario__loggedout--input{
+        font-size: 12px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .formulario__loggedout--input  {
+        font-size: 16px;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .formulario__loggedout--input#senha,.formulario__loggedout--input#confirmaSenha{
+        margin: .5rem 8rem;
+    }
+}

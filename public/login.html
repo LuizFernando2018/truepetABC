@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Adopet</title>
+    <link rel="stylesheet" href="./assets/css/normalize.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="login">
+    <div id="acessibilidade"></div>
+    <!-- cabecalho -->
+    <header>
+        <!-- formas do background -->
+        <div class="forma__topo"></div>
+        <div class="forma__lateral esquerda"></div>
+        <div class="patas"></div>
+        <!-- menu -->
+        <nav class="cabecalho container__cabecalho">
+            <ul class="cabecalho__menu" id="logado">
+                <li class="cabecalho__menu--item menu--logo" id="logo"></li>
+                <li class="cabecalho__menu--item"><a href="./animais.html" aria-label="Ir para Home"><img src="./assets/img/Casa.svg" alt="Home"></a></li>
+                <li class="cabecalho__menu--item"><a href="./mensagem.html" aria-label="Enviar Mensagens"><img src="./assets/img/Mensagens.svg" alt="Enviar Mensagens"></a></li>
+                <li class="cabecalho__menu--item"><a href="./mensagensResponsavel.html" aria-label="Ver Mensagens Recebidas"></a></li>
+                <li class="cabecalho__menu--item" id="perfil"><a href="./perfil.html" aria-label="Ir para Perfil"><img src="./assets/img/user.png" alt="Perfil" class="cabecalho__menu--itemUser"></a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="conteudo">
+        <!-- paragrafo inicial -->
+        <section class="cadastro__texto container__cadastro">
+            <div class="cadastro__logo">
+                <span class="inicio__logo-texto">TruePet</span>
+                <span class="inicio__logo-patinha">&#128062;</span> <!-- Unicode para a patinha -->
+            </div>
+            <p class="login__texto">Já tem conta? Faça seu login:</p>
+        </section>
+        
+        
+        <!-- formulario para login -->
+        <section>
+         <form data-formLogin class="login__formulario container__cadastro" name="login">
+                <div class="input-container">
+                <label for="email" class="formulario__loggedout--campo">Email</label>
+                <input type="email" data-type="email" pattern="^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$"  class="formulario__loggedout--input input" id="email" name="email" placeholder="Insira seu email" required>
+                <!-- todos inputs recebem o span abaixo para exibição de mensagem de erro -->
+                <span class="input-mensagem-erro">Campo invalido</span>
+             </div>
+                <div class="input-container">
+                <label for="senha" class="formulario__loggedout--campo">Senha</label>
+                <input type="password" data-type="senha" class="formulario__loggedout--input input" id="senha" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,12}$" placeholder="Insira senha" required>
+                <span class="input-mensagem-erro">Campo invalido</span>
+             </div>
+            
+                <a href="./recuperarSenha.html" class="login__senha--link">Esqueci minha senha</a>
+                <button type="submit" value="Enviar" id="btnSubmit" class="formulario__loggedout--botao btn">Enviar</button>
+                <p class="login__texto">Não tem login? <a href="cadastro.html">Cadastre-se</a></p>
+
+         </form>
+        </section>
+    </main> 
+    <footer class="rodape">
+        <!-- rodape -->
+        <p>2025 - Desenvolvido por acadêmicos do curso de Análise e Desenvolvimento de Sistemas.</p>
+    </footer>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="./app.js" type="module"></script>
+<script src="./js/Usuario/logarUsuario.js" type="module"></script>
+<script src="./js/Usuario/custom-accessibility-widget.js"></script>
+
+</body>
+
+</html>

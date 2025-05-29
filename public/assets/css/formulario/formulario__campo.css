@@ -1,0 +1,6 @@
+.formulario__campo {
+    color: var(--azul);
+    font-weight: 600;;
+    font-size: 1rem;
+    margin-top: 1rem;
+}

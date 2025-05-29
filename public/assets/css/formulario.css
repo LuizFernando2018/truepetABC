@@ -1,0 +1,20 @@
+.formulario {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--cinza-claro);
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+    border-radius: 10px;
+}
+
+@media screen and (min-width: 0px) {
+    .formulario{
+        padding: 1rem;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .formulario{
+        padding: 2rem;
+    }
+}

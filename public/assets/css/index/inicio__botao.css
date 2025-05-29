@@ -1,0 +1,16 @@
+.inicio__botao{
+    display: flex;
+    flex-direction: column;
+}
+
+
+@media screen and (min-width: 0px) {
+    .inicio__botao{
+        margin-top: 1.5rem;
+    }
+}
+@media screen and (min-width: 768px) {
+    .inicio__botao{
+        margin-top: 2.3rem;
+    }
+}

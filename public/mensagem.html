@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensagem - Adopet</title>
+    <link rel="stylesheet" href="./assets/css/normalize.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="./assets/css/mensagem/mensagens__lista.css">
+</head>
+<body class="mensagem">
+    <!-- cabecalho -->
+    <header>
+        <div class="forma__topo"></div>
+        <div class="forma__lateral esquerda"></div>
+        <nav class="cabecalho container__cabecalho">
+            <ul class="cabecalho__menu" id="logado">
+                <li class="cabecalho__menu--item menu--logo" id="logo"></li>
+                <li class="cabecalho__menu--item"><a href="./animais.html" aria-label="Ir para Home"><img src="./assets/img/Casa.svg" alt="Home"></a></li>
+                <li class="cabecalho__menu--item"><a href="./mensagem.html" aria-label="Enviar Mensagens"><img src="./assets/img/Mensagens.svg" alt="Enviar Mensagens"></a></li>
+                <li class="cabecalho__menu--item"><a href="./mensagensResponsavel.html" aria-label="Ver Mensagens Recebidas"><img src="./assets/img/MensagensRecebidas.svg" alt="Mensagens Recebidas"></a></li>
+                <li class="cabecalho__menu--item" id="perfil"><a href="./perfil.html" aria-label="Ir para Perfil"><img src="./assets/img/user.png" alt="Perfil" class="cabecalho__menu--itemUser"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="conteudo__mensagem">
+        <p class="texto__introducao container">Envie uma mensagem para a pessoa ou instituição que está cuidado do animal:</p>
+        <section class="mensagem__form container--cadastro">
+            <form data-formMensagem action="" class="formulario container--mensagem">
+                <div class="input-container">
+                    <label for="nome" class="formulario__campo">Nome</label>
+                    <input type="text" class="formulario__input input" id="nome" data-nome placeholder="Insira seu nome completo" required>
+                </div>
+                <div class="input-container">
+                    <label for="fone" class="formulario__campo">Telefone</label>
+                    <input type="tel" class="formulario__input input" id="phone" data-telefone placeholder="Insira seu telefone e/ou whatsapp" required>
+                </div>
+                <div class="input-container">
+                    <label for="nomeAnimal" class="formulario__campo">Nome do animal</label>
+                    <input type="text" class="formulario__input input" id="nomeAnimal" data-animal placeholder="Por qual animal você se interessou?" required>
+                </div>
+                <div class="input-container">
+                    <label for="mensagem" class="formulario__campo">Mensagem</label>
+                    <textarea class="formulario__textarea" id="mensagem" data-mensagem rows="8" cols="50" placeholder="Escreva sua mensagem." required></textarea>
+                </div>
+                <button type="submit" class="formulario__botao btn">Enviar</button>
+            </form>
+        </section>
+    </main>
+    <footer class="rodape">
+        <p>2025 - Desenvolvido por acadêmicos do curso de Análise e Desenvolvimento de Sistemas.</p>
+    </footer>
+    <script src="./js/Mensagens/mensagens.js" type="module"></script>
+</html>

@@ -1,0 +1,33 @@
+<style>
+    .vw-access-button {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 9999;
+    }
+</style>
+
+<div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+        <div class="vw-plugin-top-wrapper"></div>
+    </div>
+</div>
+
+<script>
+    // Cria dinamicamente o script do VLibras
+    const scriptVLibras = document.createElement('script');
+    scriptVLibras.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+    scriptVLibras.onload = () => {
+        const vlibras = new window.VLibras.Widget('https://vlibras.gov.br/app');
+
+        const btn = document.querySelector('.vw-access-button');
+        if (btn) {
+            btn.addEventListener('mouseover', function () {
+                this.click();
+            });
+        }
+    };
+    document.body.appendChild(scriptVLibras);
+</script>
+

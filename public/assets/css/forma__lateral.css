@@ -1,0 +1,40 @@
+.forma__lateral {
+    background-image: url(../img/Forma-2.svg);
+    background-repeat: no-repeat;
+    background-position-x: 100%;
+    background-size: contain;
+    position: absolute;
+    z-index: -2;
+    right: 0;
+    top: 199px;
+} 
+
+.esquerda {
+    width: 170px;
+}
+
+@media screen and (min-width: 0px) {
+    .forma__lateral {
+        width: 22%;
+        height: 470px;
+        max-width: 25%;
+    }
+    .esquerda {
+        transform: scaleX(-1);
+        top: 370px;
+        left: 0;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .forma__lateral {
+        width: 7.5rem;
+        height: 75vh;
+    }
+    .esquerda {
+        transform: scaleX(1);
+        top: 250px;
+        right: 0;
+        left: auto;
+    }
+}

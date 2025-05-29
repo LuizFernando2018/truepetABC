@@ -1,0 +1,20 @@
+.inicio__titulo {
+    font-family: var(--IBM);
+    font-weight: 500;
+    font-size: 26px;
+}
+
+@media screen and (min-width: 0px) {
+    .inicio__titulo {
+        font-size: 26px;
+        margin-bottom: 1rem;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .inicio__titulo {
+        font-size: 28px;
+        margin-bottom: 2rem;
+
+    }
+}

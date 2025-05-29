@@ -1,0 +1,17 @@
+@media screen and (min-width: 0px) {
+    .conteudo {
+        /* height: 60vh; */
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .conteudo {
+        height: 73vh;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .conteudo {
+        height: 100%;
+    }
+}

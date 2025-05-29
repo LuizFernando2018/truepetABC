@@ -1,0 +1,23 @@
+.patas {
+    background-image: url(../img/Patas.svg);background-repeat: no-repeat;
+    background-position-x: 100%;
+    background-size: contain;
+    position: absolute;
+    z-index: -1;
+    right: 0;
+    top: 0;
+}
+
+@media screen and (min-width: 0px) {
+    .patas {
+        width: 100%;
+        height: 200px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .patas {
+        width: 100%;
+        height: 300px;
+    }
+}

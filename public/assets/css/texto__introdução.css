@@ -1,0 +1,39 @@
+.texto__introducao {
+    margin: 0 16%;
+    font-family: var(--Poppins);
+    color: var(--azul);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+@media screen and (min-width: 0px) {
+    .texto__introducao{
+        margin-top: 5.5rem;
+    }
+    .texto__introducao#tablet{
+        display: none;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .texto__introducao  {
+        margin-top: 10rem;
+        font-size: 18px;
+    }
+    .texto__introducao#mobile{
+        display: none;
+    }
+    .texto__introducao#tablet {
+        display: flex;
+        justify-content: center;
+
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .texto__introducao{
+       width: 35%; 
+       margin: 10rem auto 2.5rem;
+       text-align: center;
+    }
+}

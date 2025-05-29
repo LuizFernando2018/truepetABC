@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adopet - Gerenciamento de Animais (Admin)</title>
+    <link rel="stylesheet" href="./assets/css/cadastro/cadastro_admin.css">
+</head>
+<body>
+   
+        <h1>Gerenciamento de Animais (Admin)</h1>
+    
+    <div id="mensagem"></div>
+
+  <section>
+    <h2>Cadastrar Novo Animal</h2>
+    <form id="form-animal">
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" required>
+
+      <label for="especie">Espécie:</label>
+      <input type="text" id="especie" required>
+
+      <label for="idade">Idade:</label>
+      <input type="number" id="idade">
+
+      <label for="descricao">Descrição:</label>
+      <textarea id="descricao"></textarea>
+
+      <label for="status">Status:</label>
+      <select id="status">
+        <option value="disponivel">Disponível</option>
+        <option value="adotado">Adotado</option>
+        <option value="pendente">Pendente</option>
+      </select>
+
+      <button type="submit">Cadastrar Animal</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Editar Animal</h2>
+    <form id="form-editar-animal">
+      <input type="hidden" id="edit-id">
+      <label for="edit-nome">Nome:</label>
+      <input type="text" id="edit-nome" required>
+
+      <label for="edit-especie">Espécie:</label>
+      <input type="text" id="edit-especie" required>
+
+      <label for="edit-idade">Idade:</label>
+      <input type="number" id="edit-idade">
+
+      <label for="edit-descricao">Descrição:</label>
+      <textarea id="edit-descricao"></textarea>
+
+      <label for="edit-status">Status:</label>
+      <select id="edit-status">
+        <option value="disponivel">Disponível</option>
+        <option value="adotado">Adotado</option>
+        <option value="pendente">Pendente</option>
+      </select>
+
+      <button type="submit">Salvar Alterações</button>
+      <button type="button" onclick="cancelarEdicao()">Cancelar</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Lista de Animais</h2>
+    <table id="tabela-animais">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Espécie</th>
+          <th>Idade</th>
+          <th>Descrição</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <script>
+    // Verifica o token imediatamente
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('Token não encontrado no localStorage. Redirecionando para login.html...');
+      document.body.innerHTML = `<p style="color: red; text-align: center;">Você precisa estar logado para acessar esta página. Redirecionando para o login...</p>`;
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2000);
+    } else {
+      console.log('Token encontrado. Inicializando página de gerenciamento de animais...');
+      inicializarPagina();
+    }
+
+    function inicializarPagina() {
+      const mensagemDiv = document.getElementById('mensagem');
+      const tabelaAnimais = document.querySelector('#tabela-animais tbody');
+      const formEditar = document.getElementById('form-editar-animal');
+      const formCadastrar = document.getElementById('form-animal');
+
+      mensagemDiv.innerHTML = `<p style="color: #555;">Carregando lista de animais...</p>`;
+      carregarAnimais();
+
+      async function carregarAnimais() {
+        try {
+          const response = await fetch('http://localhost:3000/animais/admin', {
+            method: 'GET',
+            headers: {
+              'Authorization': token
+            }
+          });
+          if (!response.ok) {
+            throw new Error(`Erro: ${response.status} - ${response.statusText}`);
+          }
+          const animais = await response.json();
+          tabelaAnimais.innerHTML = '';
+          animais.forEach(animal => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${animal.id}</td>
+              <td>${animal.nome}</td>
+              <td>${animal.especie}</td>
+              <td>${animal.idade || '-'}</td>
+              <td>${animal.descricao || '-'}</td>
+              <td>${animal.status}</td>
+              <td>
+                <button class="edit" onclick="editarAnimal(${animal.id})">Editar</button>
+                <button class="delete" onclick="deletarAnimal(${animal.id})">Deletar</button>
+              </td>
+            `;
+            tabelaAnimais.appendChild(row);
+          });
+          mensagemDiv.innerHTML = `<p style="color: green;">Lista de animais carregada com sucesso!</p>`;
+        } catch (err) {
+          console.error('Erro ao carregar animais:', err);
+          mensagemDiv.innerHTML = `<p style="color: red;">Erro ao carregar animais: ${err.message}</p>`;
+          tabelaAnimais.innerHTML = '';
+        }
+      }
+
+      formCadastrar.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const animal = {
+          nome: document.getElementById('nome').value,
+          especie: document.getElementById('especie').value,
+          idade: document.getElementById('idade').value,
+          descricao: document.getElementById('descricao').value,
+          status: document.getElementById('status').value
+        };
+
+        try {
+          const response = await fetch('http://localhost:3000/animais', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token
+            },
+            body: JSON.stringify(animal)
+          });
+          if (!response.ok) {
+            throw new Error(`Erro: ${response.status} - ${response.statusText}`);
+          }
+          const result = await response.json();
+          mensagemDiv.innerHTML = `<p style="color: green;">Animal cadastrado com sucesso! ID: ${result.id}</p>`;
+          formCadastrar.reset();
+          carregarAnimais();
+        } catch (err) {
+          console.error('Erro ao cadastrar animal:', err);
+          mensagemDiv.innerHTML = `<p style="color: red;">Erro ao conectar com o servidor: ${err.message}</p>`;
+        }
+      });
+
+      window.editarAnimal = async (id) => {
+        try {
+          const response = await fetch(`http://localhost:3000/animais/${id}`, {
+            headers: { 'Authorization': token }
+          });
+          if (!response.ok) {
+            throw new Error(`Erro: ${response.status} - ${response.statusText}`);
+          }
+          const animal = await response.json();
+          document.getElementById('edit-id').value = animal.id;
+          document.getElementById('edit-nome').value = animal.nome;
+          document.getElementById('edit-especie').value = animal.especie;
+          document.getElementById('edit-idade').value = animal.idade || '';
+          document.getElementById('edit-descricao').value = animal.descricao || '';
+          document.getElementById('edit-status').value = animal.status;
+
+          formEditar.style.display = 'block';
+          formCadastrar.style.display = 'none';
+        } catch (err) {
+          console.error('Erro ao buscar animal para edição:', err);
+          mensagemDiv.innerHTML = `<p style="color: red;">Erro ao carregar animal: ${err.message}</p>`;
+        }
+      };
+
+      formEditar.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('edit-id').value;
+        const animal = {
+          nome: document.getElementById('edit-nome').value,
+          especie: document.getElementById('edit-especie').value,
+          idade: document.getElementById('edit-idade').value,
+          descricao: document.getElementById('edit-descricao').value,
+          status: document.getElementById('edit-status').value
+        };
+
+        try {
+          const response = await fetch(`http://localhost:3000/animais/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token
+            },
+            body: JSON.stringify(animal)
+          });
+          if (!response.ok) {
+            throw new Error(`Erro: ${response.status} - ${response.statusText}`);
+          }
+          const result = await response.json();
+          mensagemDiv.innerHTML = `<p style="color: green;">Animal atualizado com sucesso!</p>`;
+          formEditar.style.display = 'none';
+          formCadastrar.style.display = 'block';
+          carregarAnimais();
+        } catch (err) {
+          console.error('Erro ao atualizar animal:', err);
+          mensagemDiv.innerHTML = `<p style="color: red;">Erro ao atualizar animal: ${err.message}</p>`;
+        }
+      });
+
+      window.cancelarEdicao = () => {
+        formEditar.style.display = 'none';
+        formCadastrar.style.display = 'block';
+        mensagemDiv.innerHTML = `<p style="color: green;">Lista de animais carregada com sucesso!</p>`;
+        carregarAnimais();
+      };
+
+      window.deletarAnimal = async (id) => {
+        if (!confirm('Tem certeza que deseja deletar este animal?')) return;
+
+        try {
+          const response = await fetch(`http://localhost:3000/animais/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': token
+            }
+          });
+          if (!response.ok) {
+            throw new Error(`Erro: ${response.status} - ${response.statusText}`);
+          }
+          const result = await response.json();
+          mensagemDiv.innerHTML = `<p style="color: green;">Animal deletado com sucesso!</p>`;
+          carregarAnimais();
+        } catch (err) {
+          console.error('Erro ao deletar animal:', err);
+          mensagemDiv.innerHTML = `<p style="color: red;">Erro ao deletar animal: ${err.message}</p>`;
+        }
+      };
+    }
+  </script>
+</body>
+</html>

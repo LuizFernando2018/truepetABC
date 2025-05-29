@@ -1,0 +1,48 @@
+.index {
+    background: #80A6C3; /* Azul pastel mais forte */
+}
+
+.inicio {
+    text-align: center;
+    color: #FFFFFF; /* Letras brancas */  
+} 
+
+@media screen and (min-width: 0px) {
+    .inicio {
+        margin-top: 6rem;
+        height: 60vh;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .inicio {
+        margin-top: 10rem;
+        height: 40vh;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .inicio {
+        height: calc(100vh - 17rem);
+        margin-top: 2.5rem;
+    }
+
+    .inicio__logo {
+        display: flex;
+        align-items: center;  /* Alinha os itens verticalmente */
+        justify-content: center; /* Alinha os itens horizontalmente */
+    }
+    
+    .inicio__logo-texto {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #FFFFFF; /* Cor branca para o texto */
+        margin-right: 10px; /* Espaçamento entre o texto e a patinha */
+    }
+    
+    .inicio__logo-patinha {
+        font-size: 2rem; /* Tamanho da patinha */
+        color: #FFFFFF; /* Cor da patinha */
+    }
+    
+}

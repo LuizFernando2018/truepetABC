@@ -1,0 +1,14 @@
+.formulario__fotoperfil--legenda{
+    font-size: 12px;
+    color: #FC7071;
+    ;
+}
+@media screen and (min-width: 0px) {
+
+}
+
+@media screen and (min-width: 768px) {
+    .formulario__fotoperfil--legenda {
+        margin-top: .25rem;
+    }
+}

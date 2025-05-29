@@ -1,0 +1,75 @@
+/*gerais do site*/
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500&family=Poppins:wght@400;600&display=swap');
+@import url(./root.css);
+@import url(./btn.css);
+@import url(./container.css);
+@import url(./cabecalho.css);
+@import url(./cabecalho/cabecalho__menu--item.css);
+@import url(./cabecalho/cabecalho__menu.css);
+@import url(./cabecalho/cabecalho__menu--itemUser.css);
+@import url(./cabecalho/cabecalho__menu--logo.css);
+@import url(./texto__introdução.css);
+@import url(./conteudo.css);
+@import url(./rodape.css);
+
+
+/*index*/
+@import url(./inicio.css);
+@import url(./index/inicio__titulo.css);
+@import url(./logo.css);
+@import url(./index/inicio__texto.css);
+@import url(./index/inicio__botao.css);
+@import url(./index/inicio__botao--item.css);
+@import url(./forma__topo.css);
+@import url(./forma__lateral.css);
+@import url(./ilustracao/ilustracao.css);
+@import url(./ilustracao/ilustracao__imagem.css);
+
+
+
+/* formularios*/
+@import url(./input.css);
+@import url(./formulario.css);
+@import url(./formulario/formulario__botao.css);
+@import url(./formulario/formulario__campo.css);
+@import url(./formulario/formulario__fotoperfil--foto.css);
+@import url(./formulario/formulario__fotoperfil--legenda.css);
+@import url(./formulario/formulario__fotoperfil.css);
+@import url(./formulario/formulario__input.css);
+@import url(./formulario/formulario__perfil--titulo.css);
+@import url(./formulario/formulario__textarea.css);
+@import url(./formulario/formulario__loggedout--botao.css);
+@import url(./formulario/formulario__loggedout--campo.css);
+@import url(./formulario/formulario__loggedout--input.css);
+@import url(./mensagem.css);
+
+/* pagina cadastro*/
+@import url(./cadastro.css);
+/* @import url(./cadastro/cadastro__conteudo.css); */
+@import url(./cadastro/cadastro__texto.css);
+@import url(./cadastro/cadastro__texto--paragrafo.css);
+@import url(./cadastro/cadastro__formulario.css);
+@import url(./patas.css);
+
+/*página login*/
+@import url(./login.css);
+@import url(./login/login__formulario.css);
+@import url(./login/login__texto.css);
+@import url(./login/login__link--senha.css);
+
+/*mensagem*/
+@import url(./conteudo/conteudo__mensagem.css);
+@import url(./mensagem/mensagem__form.css);
+
+/* pagina animais */
+@import url(./galeria.css);
+@import url(./animais/animal.css);
+@import url(./animais/animal__imagem.css);
+@import url(./animais/animal__descricao.css);
+@import url(./animais/animal__nome.css);
+@import url(./animais/animal__descricao--texto.css);
+@import url(./animais/animal__local.css);
+@import url(./animais/animal__mensagem.css);
+@import url(./animais/animal__mensagem--texto.css);
+
+

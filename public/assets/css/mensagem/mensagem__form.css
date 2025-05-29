@@ -1,0 +1,26 @@
+.mensagem__form {
+    background-color: var(--cinza-claro);
+    border-radius: 10px;
+    margin-top: 1.5rem;
+}
+
+@media screen and (min-width: 0px) {
+    .mensagem__form {
+        margin: 1.5rem;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .mensagem__form  {
+        margin: 3.5rem 7rem;
+        margin-bottom: 7rem;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .mensagem__form  {
+        width: 40%;
+        margin: auto;
+        text-align: center;
+    }
+}

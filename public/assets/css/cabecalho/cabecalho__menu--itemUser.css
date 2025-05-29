@@ -1,0 +1,25 @@
+.cabecalho__menu--itemUser{
+    border-radius: 100%;
+
+}
+
+@media screen and (min-width: 0px) {
+    .cabecalho__menu--itemUser {
+        height: 40px;
+        width: 40px;
+       }
+   }
+   
+@media screen and (min-width: 768px) {
+    .cabecalho__menu--itemUser {
+            height: 48px;
+            width: 48px;
+       }
+   }
+
+@media screen and (min-width: 1280px) {
+    .cabecalho__menu--itemUser {
+            height: 56px;
+            width: 56px;
+       }
+   }

@@ -1,0 +1,15 @@
+:root {
+    --azul: #4A90E2;         /* Azul mais vibrante */
+    --verde: #50E3C2;        /* Verde mais forte */
+    --rosa: #F1A7C1;         /* Rosa mais suave */
+    --vermelho-claro: #FF6B6B; /* Vermelho mais intenso */
+    --creme: #FFF5E1;        /* Creme mais suave */
+    --cinza-escuro: #505050;  /* Cinza escuro mais profundo */
+    --cinza-medio: #A6A6A6;   /* Cinza médio mais neutro */
+    --cinza-claro: #EFEFEF;   /* Cinza claro mais suave */
+
+    --IBM: 'IBM Plex Sans', sans-serif;
+    --Poppins: 'Poppins', sans-serif;
+}
+
+

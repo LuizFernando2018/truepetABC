@@ -1,0 +1,42 @@
+.mensagens__lista {
+    padding: 0;
+    list-style: none;
+}
+
+.mensagem__item {
+    border: 1px solid var(--cinza-claro);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mensagem__item h3 {
+    margin: 0 0 0.5rem;
+    color: var(--azul);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.mensagem__item p {
+    margin: 0.25rem 0;
+    color: var(--cinza-escuro);
+    font-size: 1rem;
+}
+
+@media screen and (min-width: 768px) {
+    .mensagens__lista {
+        padding: 0 1rem;
+    }
+
+    .mensagem__item {
+        padding: 1.5rem;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .mensagens__lista {
+        padding: 0 2rem;
+    }
+}
