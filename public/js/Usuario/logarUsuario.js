@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const errorData = await response.json();
         // Limpar mensagens de erro de email/senha antes de mostrar erro 2FA ou outros
-        limparMensagensErro(); 
+        limparMensagensErro();
 
         if (errorData.error && errorData.error.field === 'twoFactor') {
           console.log('2FA requerido:', errorData.error.message);
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             twoFactorCodeInput = document.getElementById('twoFactorCode');
             twoFactorErrorSpan = document.getElementById('twoFactorError');
           }
-          
+
           inputs.email.readOnly = true;
           inputs.senha.readOnly = true;
 

@@ -7,13 +7,13 @@ console.log('Script perfilUsuario.js carregado com sucesso'); // Log inicial
 // const defineIdGeral = () => { // Temporariamente comentado, ID será do token
 //   const verificarID = new URL(window.location);
 //   const id = verificarID.searchParams.get('id');
-//   console.log('ID extraído da URL:', id); 
+//   console.log('ID extraído da URL:', id);
 //   return id;
 // };
 
 const verificaTipoUsuario = () => { // Esta função pode ser simplificada ou integrada em exibeDados
   const token = localStorage.getItem('token');
-  // console.log('Token encontrado no localStorage:', token); 
+  // console.log('Token encontrado no localStorage:', token);
   if (!token) {
     // console.log('Token não encontrado, redirecionando para login.html');
     window.location.href = 'login.html';
@@ -21,7 +21,7 @@ const verificaTipoUsuario = () => { // Esta função pode ser simplificada ou in
   }
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
-    // console.log('Payload do token:', payload); 
+    // console.log('Payload do token:', payload);
     return payload; // Retorna todo o payload para ter acesso ao ID e tipo
   } catch (erro) {
     console.error('Erro ao decodificar token:', erro);
@@ -53,7 +53,7 @@ const mostraDados = (usuario) => {
     <input data-type="cidade" type="text" class="formulario__input input" id="cidade" placeholder="São Paulo" value="${usuario.cidade || ''}">
     <label for="mensagem" class="formulario__campo">Sobre</label>
     <textarea data-type="sobre" class="formulario__textarea" id="mensagem" rows="6" cols="50" placeholder="At vero eos et accusamus et iusto odio...">${usuario.sobre || ''}</textarea>
-    
+
     <div class="two-factor-section">
       <h3>Autenticação de Dois Fatores (2FA)</h3>
       <p id="twoFactorStatusText">Status 2FA: Verificando...</p>
@@ -65,7 +65,8 @@ const mostraDados = (usuario) => {
 };
 
 // --- Funções para 2FA ---
-async function handleEnableTwoFactor() {
+async function handleEnableTwoFactor(event) {
+  event.preventDefault();
   console.log('Tentando ativar 2FA...');
   const token = localStorage.getItem('token');
   if (!token) {
@@ -77,9 +78,9 @@ async function handleEnableTwoFactor() {
   try {
     const response = await fetch('http://localhost:3000/enable-two-factor', {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json', // Embora não haja corpo, é uma boa prática
-        'Authorization': token 
+        'Authorization': token
       }
     });
 
@@ -101,7 +102,8 @@ async function handleEnableTwoFactor() {
   }
 }
 
-async function handleDisableTwoFactor() {
+async function handleDisableTwoFactor(event) {
+  event.preventDefault();
   console.log('Tentando desativar 2FA...');
   const token = localStorage.getItem('token');
   if (!token) {
@@ -117,9 +119,9 @@ async function handleDisableTwoFactor() {
   try {
     const response = await fetch('http://localhost:3000/disable-two-factor', {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json', // Embora não haja corpo, é uma boa prática
-        'Authorization': token 
+        'Authorization': token
       }
     });
 
@@ -153,7 +155,7 @@ function updateTwoFactorUI(isTwoFactorEnabled, qrCodeDataUrl = null) {
   }
 
   // Limpa QR Code e remove ouvintes antigos para evitar duplicação
-  qrDivElement.innerHTML = ''; 
+  qrDivElement.innerHTML = '';
   // Para remover event listeners, é mais seguro substituir o botão por um clone dele.
   const newButton = buttonElement.cloneNode(true);
   buttonElement.parentNode.replaceChild(newButton, buttonElement);
@@ -204,22 +206,22 @@ const exibeDados = async () => {
       window.location.href = 'perfil.html'; // Ou uma página de "não autorizado"
       return;
     }
-    
+
     // O token já foi verificado em verificaTipoUsuario, mas pegamos ele de novo para a requisição
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem('token');
     // A verificação de !token já está em verificaTipoUsuario, mas uma dupla checagem não prejudica.
-    if (!token) { 
+    if (!token) {
       // console.log('Token não encontrado (redundante), redirecionando para login.html');
       window.location.href = 'login.html';
       return;
     }
-    
+
     // console.log('Buscando perfil do usuário com ID do token:', userIdFromToken);
 
-    const response = await fetch(`/perfil/${userIdFromToken}`, { 
+    const response = await fetch(`/perfil/${userIdFromToken}`, {
       method: 'GET',
       headers: {
-        'Authorization': token, 
+        'Authorization': token,
         'Content-Type': 'application/json'
       }
     });
@@ -241,7 +243,7 @@ const exibeDados = async () => {
       alert('Dados do usuário não encontrados.');
       return;
     }
-    
+
     const formulario = document.querySelector('[data-formPerfil]');
     if (!formulario) {
       console.error('Elemento [data-formPerfil] não encontrado no DOM! Verifique o HTML.');
@@ -252,7 +254,7 @@ const exibeDados = async () => {
 
     const perfilDiv = mostraDados(usuario);
     // console.log('Perfil div criado:', perfilDiv);
-    
+
     while (formulario.firstChild) {
       formulario.removeChild(formulario.firstChild);
     }
@@ -260,7 +262,7 @@ const exibeDados = async () => {
 
     // Inicializa a UI do 2FA DEPOIS que os elementos HTML foram adicionados ao DOM
     // A propriedade twoFactorEnabled deve vir do objeto 'usuario'
-    updateTwoFactorUI(usuario.twoFactorEnabled); 
+    updateTwoFactorUI(usuario.twoFactorEnabled);
 
   } catch (error) {
     console.error('Erro detalhado em exibeDados:', error);
