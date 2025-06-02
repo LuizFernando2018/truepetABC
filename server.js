@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
+import bcrypt from 'bcrypt';
 import rateLimit from 'express-rate-limit';
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
@@ -73,21 +74,6 @@ const loginLimiter = rateLimit({
   }
 });
 
-// Configuração do rate limit para recuperação de senha
-const recoverLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minuto
-  max: 3, // Máximo de 3 tentativas por IP
-  message: {
-    error: 'Muitas tentativas de recuperação de senha. Tente novamente após 1 minuto.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res, next, options) => {
-    console.log(`Limite de tentativas excedido para IP: ${req.ip}`);
-    res.status(429).json(options.message);
-  }
-});
-
 // Rota de login com 2FA
 app.post('/login', loginLimiter, async (req, res) => {
   try {
@@ -98,43 +84,188 @@ app.post('/login', loginLimiter, async (req, res) => {
   } catch (erro) {
     console.error('Erro no login:', erro);
     res.status(401).json(erro);
-  }
-});
-
-// Rota de recuperação de senha
+// Rota para redefinir senha com código de verificação
 app.post(
-  '/recuperar-senha',
-  recoverLimiter,
+  '/redefinir-senha-com-codigo',
   [
-    body('email').trim().isEmail().withMessage({ field: 'email', message: 'Email inválido' }).normalizeEmail()
+    body('email').trim().isEmail().withMessage('Formato de email inválido.').normalizeEmail(),
+    body('codigo').isString().isLength({ min: 6, max: 6 }).withMessage('Código deve ter 6 dígitos.'),
+    body('novaSenha')
+      .isLength({ min: 8, max: 12 }).withMessage('A senha deve ter entre 8 e 12 caracteres.')
+      .matches(/[A-Z]/).withMessage('A senha deve conter pelo menos 1 letra maiúscula.')
+      .matches(/[0-9]/).withMessage('A senha deve conter pelo menos 1 número.')
+      .matches(/[!@#$%^&*]/).withMessage('A senha deve conter pelo menos 1 caractere especial.')
   ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: errors.array()[0].msg });
+      // Return the first error and its field
+      const firstError = errors.array()[0];
+      return res.status(400).json({ error: { message: firstError.msg, field: firstError.param } });
     }
 
+    const { email, codigo, novaSenha } = req.body;
+
     try {
-      const { email } = req.body;
+      const [userRows] = await connection.execute('SELECT * FROM Usuarios WHERE email = ?', [email]);
+      if (userRows.length === 0) {
+        return res.status(404).json({ error: { message: 'Usuário não encontrado.', field: 'email' } });
+      }
+      const user = userRows[0];
+
+      const now = new Date();
+      const [codeRows] = await connection.execute(
+        'SELECT * FROM PasswordResetCodes WHERE userId = ? AND code = ? AND expiresAt > ?',
+        [user.id, codigo, now]
+      );
+
+      if (codeRows.length === 0) {
+        await logAudit(user.id, 'password_reset_invalid_code_attempt', { email, code: codigo });
+        return res.status(400).json({ error: { field: 'codigo', message: 'Código inválido ou expirado.' } });
+      }
+
+      // Invalidar o código usado
+      await connection.execute('DELETE FROM PasswordResetCodes WHERE userId = ? AND code = ?', [user.id, codigo]);
+
+      const hashedPassword = await bcrypt.hash(novaSenha, 10);
+      await connection.execute('UPDATE Usuarios SET senha = ? WHERE id = ?', [hashedPassword, user.id]);
+
+      await logAudit(user.id, 'password_reset_with_code_success', { email });
+
+      res.status(200).json({ message: 'Senha redefinida com sucesso!' });
+
+    } catch (error) {
+      console.error('Erro no servidor ao redefinir senha com código:', error);
+      // Attempt to get userId for logging, even if it's just from email if user object not yet fetched
+      let logUserId = null;
+      if (typeof user !== 'undefined' && user && user.id) {
+        logUserId = user.id;
+      } else {
+          try {
+            const [tempUserRows] = await connection.execute('SELECT id FROM Usuarios WHERE email = ?', [email]);
+            if (tempUserRows.length > 0) logUserId = tempUserRows[0].id;
+          } catch (e) { /* ignore lookup error for logging */ }
+      }
+      await logAudit(logUserId, 'password_reset_with_code_server_error', { email, code: codigo, error: error.message });
+      res.status(500).json({ error: { message: 'Erro interno do servidor ao tentar redefinir a senha.' } });
+    }
+  }
+);
+
+// Rota para solicitar código de recuperação de senha
+app.post(
+  '/solicitar-codigo-recuperacao',
+  [
+    body('email').trim().isEmail().withMessage('Formato de email inválido.').normalizeEmail()
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      // Return the first error message
+      return res.status(400).json({ error: { message: errors.array()[0].msg, field: errors.array()[0].param } });
+    }
+
+    const { email } = req.body;
+
+    try {
       const [rows] = await connection.execute('SELECT * FROM Usuarios WHERE email = ?', [email]);
       if (rows.length === 0) {
-        return res.status(404).json({ error: { field: 'email', message: 'Email não encontrado' } });
+        // Log a tentativa de recuperação para um email não existente, mas não informe ao usuário que o email não existe por segurança.
+        // console.log(`Tentativa de recuperação de senha para email não cadastrado: ${email}`);
+        // await logAudit(null, 'attempt_password_reset_nonexistent_email', { email });
+        // Retorne uma mensagem genérica para evitar enumeração de usuários.
+        // No entanto, para fins de depuração e feedback ao frontend, vamos retornar 404 por enquanto.
+        // Em produção, considerar mudar para 200 com mensagem genérica.
+        return res.status(404).json({ error: { message: 'Email não encontrado.', field: 'email' } });
       }
 
       const user = rows[0];
-      const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      const resetLink = `http://localhost:3000/redefinir-senha?token=${token}`;
+      const codigo = Math.floor(100000 + Math.random() * 900000).toString(); // Gera código de 6 dígitos
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // Expira em 15 minutos
 
-      // Simulando envio de email (pode ser substituído por Nodemailer ou outro serviço de email)
-      console.log(`Link de recuperação para ${email}: ${resetLink}`);
+      // Armazenar Código no Banco (assumindo tabela PasswordResetCodes)
+      // Primeiro, delete códigos antigos para este usuário
+      await connection.execute('DELETE FROM PasswordResetCodes WHERE userId = ?', [user.id]);
+      // Insira o novo código
+      await connection.execute('INSERT INTO PasswordResetCodes (userId, code, expiresAt) VALUES (?, ?, ?)', [user.id, codigo, expiresAt]);
 
-      // Registrar a solicitação de recuperação na auditoria
-      await logAudit(user.id, 'request_password_reset', { email });
+      // Simular Envio de Email
+      console.log(`Código de recuperação para ${email} (ID: ${user.id}): ${codigo}`);
 
-      res.status(200).json({ message: 'Link de recuperação enviado com sucesso' });
-    } catch (err) {
-      console.error('Erro ao processar recuperação de senha:', err);
-      res.status(500).json({ error: { field: 'general', message: 'Erro ao processar recuperação de senha' } });
+      // Log de Auditoria
+      await logAudit(user.id, 'request_password_reset_code', { email });
+
+      res.status(200).json({ message: 'Código de recuperação enviado para o seu email.' });
+
+    } catch (error) {
+      console.error('Erro no servidor ao solicitar código de recuperação:', error);
+      await logAudit(null, 'request_password_reset_code_server_error', { email, error: error.message });
+      res.status(500).json({ error: { message: 'Erro interno do servidor ao tentar solicitar o código.' } });
+    }
+  }
+);
+
+// Rota para finalizar a redefinição de senha
+app.post(
+  '/redefinir-senha-final',
+  [
+    body('token').notEmpty().withMessage('Token é obrigatório'),
+    body('novaSenha')
+      .isLength({ min: 8, max: 12 }).withMessage('A senha deve ter entre 8 e 12 caracteres')
+      .matches(/[A-Z]/).withMessage('A senha deve conter pelo menos 1 letra maiúscula')
+      .matches(/[0-9]/).withMessage('A senha deve conter pelo menos 1 número')
+      .matches(/[!@#$%^&*]/).withMessage('A senha deve conter pelo menos 1 caractere especial')
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { token, novaSenha } = req.body;
+
+    try {
+      let decodedToken;
+      try {
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (jwtError) {
+        // Log específico para erro de JWT
+        console.error('Erro ao verificar JWT:', jwtError.message);
+        await logAudit(null, 'password_reset_invalid_token', { token, error: jwtError.message });
+        return res.status(401).json({ error: { message: 'Token inválido ou expirado.' } });
+      }
+
+      const userId = decodedToken.id;
+      const userEmail = decodedToken.email; // Email from token
+
+      if (!userId) {
+        // Should not happen if token structure is consistent
+        console.error('ID do usuário não encontrado no token JWT após verificação bem-sucedida.');
+        await logAudit(null, 'password_reset_missing_userid_in_token', { token });
+        return res.status(401).json({ error: { message: 'Token inválido ou corrompido.' } });
+      }
+
+      const hashedPassword = await bcrypt.hash(novaSenha, 10);
+
+      const [result] = await connection.execute(
+        'UPDATE Usuarios SET senha = ? WHERE id = ?',
+        [hashedPassword, userId]
+      );
+
+      if (result.affectedRows === 0) {
+        await logAudit(userId, 'password_reset_user_not_found_or_update_failed', { email: userEmail });
+        return res.status(404).json({ error: { message: 'Usuário não encontrado ou senha não pôde ser atualizada.' } });
+      }
+
+      await logAudit(userId, 'password_reset_success', { email: userEmail });
+
+      res.status(200).json({ message: 'Senha redefinida com sucesso!' });
+
+    } catch (error) {
+      console.error('Erro no servidor ao redefinir senha:', error);
+      // Log genérico para outros erros
+      await logAudit(req.body.token ? jwt.decode(req.body.token)?.id : null, 'password_reset_server_error', { error: error.message });
+      res.status(500).json({ error: { message: 'Erro interno do servidor ao tentar redefinir a senha.' } });
     }
   }
 );
