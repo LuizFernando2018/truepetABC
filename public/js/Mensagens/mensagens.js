@@ -34,6 +34,7 @@ if (!formulario) {
 
         try {
             const token = localStorage.getItem('token');
+            console.log('Token enviado pelo mensagens.js:', token);
 
             const headers = {
                 'Content-Type': 'application/json'

@@ -60,6 +60,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const verifyToken = (req, res, next) => {
   const token = req.headers['authorization'];
+  console.log('Token recebido no backend (verifyToken):', token);
   if (!token) {
     return res.status(403).json({ error: 'Token não fornecido' });
   }
