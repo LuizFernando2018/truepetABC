@@ -33,9 +33,21 @@ if (!formulario) {
         console.log('Enviando mensagem com animal_id:', animalId); // Adiciona log para depuração
 
         try {
+            const token = localStorage.getItem('token');
+
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            } else {
+                console.warn('Token não encontrado no localStorage. A requisição para /mensagem pode falhar ou ser negada.');
+            }
+
             const response = await fetch('http://localhost:3000/mensagem', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({ nome, telefone, animal, mensagem, animal_id: animalId })
             });
             if (response.ok) {
