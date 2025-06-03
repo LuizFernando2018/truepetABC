@@ -110,6 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const novaSenha = inputNovaSenha.value;
             const confirmaSenha = inputConfirmaNovaSenha.value;
 
+            console.log('Enviando para /redefinir-senha-com-codigo:', { email, codigo, novaSenha, tipoCodigo: typeof codigo, tamanhoCodigo: codigo.length });
+
             if (!codigo) {
                 const codigoContainer = inputCodigo.parentElement;
                 const codigoErrorSpan = codigoContainer.querySelector('.input-mensagem-erro');
