@@ -29,6 +29,7 @@
     "json-server": "^0.16.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.0",
+    "nodemailer": "^7.0.3",
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0"
   },

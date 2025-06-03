@@ -10,11 +10,37 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
+import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
 
 dotenv.config();
+
+// Configuração do Nodemailer Transporter
+let transporter;
+if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER, // Seu email do Gmail (do .env)
+      pass: process.env.EMAIL_PASS  // Sua senha de app do Gmail (do .env)
+    }
+  });
+
+  // Verificar a conexão do transporter (opcional, mas bom para debug)
+  transporter.verify(function(error, success) {
+    if (error) {
+      console.error('Erro ao configurar o transporter do Nodemailer:', error);
+      console.warn('AVISO: O envio de email para recuperação de senha pode não funcionar. Verifique as variáveis de ambiente EMAIL_USER e EMAIL_PASS e as configurações da conta Gmail.');
+    } else {
+      console.log('Nodemailer transporter configurado e pronto para enviar emails.');
+    }
+  });
+} else {
+  console.warn('AVISO: Variáveis de ambiente EMAIL_USER ou EMAIL_PASS não definidas. O envio de email para recuperação de senha está DESABILITADO.');
+  console.log('Para habilitar, configure EMAIL_USER e EMAIL_PASS no arquivo .env e reinicie o servidor.');
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -189,8 +215,56 @@ app.post(
       // Insira o novo código
       await connection.execute('INSERT INTO PasswordResetCodes (userId, code, expiresAt) VALUES (?, ?, ?)', [user.id, codigo, expiresAt]);
 
-      // Simular Envio de Email
-      console.log(`Código de recuperação para ${email} (ID: ${user.id}): ${codigo}`);
+      // Enviar Email com o código
+      if (!transporter) {
+        console.error('ERRO FATAL: Transporter do Nodemailer não está configurado. Não é possível enviar email de recuperação.');
+        // Mantém o código no log do console como fallback APENAS para desenvolvimento,
+        // mas em produção isso seria um erro crítico que impede a recuperação.
+        console.log(`FALLBACK (Sem Email): Código de recuperação para ${email}: ${codigo}`);
+        // Para o usuário, a requisição pode falhar aqui ou prosseguir e ele pega o código do log.
+        // Vamos optar por falhar para que o problema de configuração de email seja percebido.
+        return res.status(500).json({ error: { message: 'Erro no servidor ao tentar enviar o código de recuperação. Por favor, tente mais tarde.' } });
+      }
+
+      const mailOptions = {
+        from: `"TruePet Adopet" <${process.env.EMAIL_USER}>`, // Nome do remetente e email
+        to: email, // Email do destinatário (usuário)
+        subject: 'Seu Código de Recuperação de Senha - TruePet Adopet',
+        text: `Olá ${user.nome || 'usuário'},
+
+Seu código de recuperação de senha é: ${codigo}
+
+Este código expira em 15 minutos.
+
+Se você não solicitou esta recuperação, por favor ignore este email.
+
+Atenciosamente,
+Equipe TruePet Adopet`,
+        html: `
+          <p>Olá ${user.nome || 'usuário'},</p>
+          <p>Seu código de recuperação de senha é: <strong>${codigo}</strong></p>
+          <p>Este código expira em 15 minutos.</p>
+          <p>Se você não solicitou esta recuperação, por favor ignore este email.</p>
+          <p>Atenciosamente,<br>Equipe TruePet Adopet</p>
+        `
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Email de recuperação enviado com sucesso para: ${email}`);
+        // A resposta de sucesso para o cliente já está mais abaixo na rota, mantenha como está.
+        // res.status(200).json({ message: 'Código de recuperação enviado para o seu email.' });
+      } catch (emailError) {
+        console.error(`Erro ao enviar email de recuperação para ${email}:`, emailError);
+        // Logar o código no console como fallback em caso de falha no envio do email
+        console.log(`FALLBACK (Falha no Email): Código de recuperação para ${email}: ${codigo}`);
+        // Informar ao usuário que houve um problema, mas o código pode estar no log do servidor se for ambiente de dev.
+        // Ou pode-se optar por uma mensagem mais genérica.
+        // Para este caso, vamos manter a mensagem genérica de erro 500 que o catch externo da rota já faria,
+        // mas o log acima é importante.
+        // Lançamos o erro para ser pego pelo catch geral da rota.
+        throw emailError;
+      }
 
       // Log de Auditoria
       await logAudit(user.id, 'request_password_reset_code', { email });
