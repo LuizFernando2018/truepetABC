@@ -593,16 +593,74 @@ app.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+
     try {
-      const { nome, telefone, animal, mensagem, animal_id } = req.body;
-      const novaMensagem = await mensagemService.enviarMensagem(nome, telefone, animal, mensagem, animal_id);
+      const { nome, telefone, animal, mensagem } = req.body; // animal_id pode ser pego se necessário para logAudit
+      const animal_id = req.body.animal_id || null; // Garante que animal_id exista para o log, mesmo que opcional
 
-      // Registrar o envio de mensagem na auditoria
-      await logAudit(req.userId, 'send_message', { nome, animal_id });
+      // 1. Obter email do usuário logado
+      const perfilUsuario = await clientService.perfilUsuario(req.userId);
+      if (!perfilUsuario || !perfilUsuario.email) {
+        await logAudit(req.userId, 'send_message_fail_no_user_email', { nome_contato: nome, animal_id });
+        return res.status(404).json({ erro: 'Usuário ou email do usuário não encontrado para responder.' });
+      }
+      const emailRemetente = perfilUsuario.email;
 
-      res.status(201).json(novaMensagem);
-    } catch (erro) {
-      res.status(400).json({ erro: erro.message });
+      // 2. Verificar se o transporter do Nodemailer está pronto
+      if (!transporter) {
+        console.error('ERRO: Transporter do Nodemailer não está configurado. Não é possível enviar mensagem de contato.');
+        await logAudit(req.userId, 'send_message_fail_nodemailer_not_configured', { nome_contato: nome, destinatario: process.env.EMAIL_USER });
+        return res.status(500).json({ erro: 'Erro no servidor ao tentar enviar a mensagem. O sistema de email não está configurado.' });
+      }
+
+      // 3. Construir mailOptions
+      const mailOptions = {
+        from: `"${perfilUsuario.nome || 'Usuário TruePet'}" <${process.env.EMAIL_USER}>`, // Remetente é o sistema/app, mas pode mostrar nome do usuário
+        to: process.env.EMAIL_USER, // Envia para truepetservice@gmail.com
+        replyTo: emailRemetente,    // Para que a TruePet possa responder diretamente ao usuário
+        subject: `Nova mensagem sobre o animal: ${animal} de ${nome}`,
+        text: `
+Nome do Contato: ${nome}
+Telefone: ${telefone}
+Email para Resposta: ${emailRemetente}
+Nome do Animal de Interesse: ${animal}
+
+Mensagem:
+${mensagem}
+        `,
+        html: `
+          <h3>Nova Mensagem de Contato - TruePet</h3>
+          <p><strong>Nome do Contato:</strong> ${nome}</p>
+          <p><strong>Telefone:</strong> ${telefone}</p>
+          <p><strong>Email para Resposta:</strong> <a href="mailto:${emailRemetente}">${emailRemetente}</a></p>
+          <hr>
+          <p><strong>Animal de Interesse:</strong> ${animal}</p>
+          <p><strong>Mensagem:</strong></p>
+          <p>${mensagem.replace(/\n/g, '<br>')}</p>
+        `
+      };
+
+      // 4. Enviar o email
+      await transporter.sendMail(mailOptions);
+      console.log(`Mensagem de contato de ${emailRemetente} sobre ${animal} enviada para ${process.env.EMAIL_USER}`);
+
+      // 5. Log de Auditoria (adaptado)
+      await logAudit(req.userId, 'send_contact_message_success', {
+        remetente: emailRemetente,
+        destinatario: process.env.EMAIL_USER, // O email da TruePet que recebeu
+        animal: animal,
+        nome_contato: nome
+      });
+
+      // 6. Responder ao Frontend
+      res.status(200).json({ mensagem: 'Mensagem enviada com sucesso!' });
+
+    } catch (error) {
+      console.error('Erro ao processar /mensagem:', error);
+      // Tenta obter userId para o log mesmo em caso de erro antes da obtenção do perfil
+      const userIdForAudit = req.userId || null;
+      await logAudit(userIdForAudit, 'send_contact_message_error', { error: error.message, nome_contato: req.body.nome, animal_nome: req.body.animal });
+      res.status(500).json({ erro: 'Erro interno do servidor ao tentar enviar a mensagem.' });
     }
   }
 );
