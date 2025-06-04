@@ -81,7 +81,8 @@ app.use(
       ],
       imgSrc: [
         "'self'",
-        "data:"
+        "data:",
+        "https://vlibras.gov.br" // <<< ADICIONADO
       ],
       connectSrc: [
         "'self'"
