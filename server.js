@@ -59,18 +59,35 @@ app.use(cors({
 app.use(express.static(path.join(__dirname, 'public')));
 
 const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization'];
-  console.log('Token recebido no backend (verifyToken):', token);
-  if (!token) {
-    return res.status(403).json({ error: 'Token não fornecido' });
+  const authHeader = req.headers['authorization'];
+  // Log para ver o JWT_SECRET usado na verificação
+  console.log('[verifyToken] JWT_SECRET em uso para verificação:', process.env.JWT_SECRET);
+  console.log('[verifyToken] Cabeçalho Authorization recebido:', authHeader);
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('[verifyToken] Falha: Token não fornecido ou mal formatado (sem prefixo "Bearer ").');
+    return res.status(403).json({ error: 'Token não fornecido ou mal formatado.' });
   }
+
+  const tokenItself = authHeader.split(' ')[1]; // Extrai apenas a string do token
+  console.log('[verifyToken] Token puro extraído para verificação:', tokenItself);
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(tokenItself, process.env.JWT_SECRET); // Usa o token puro
     req.userId = decoded.id;
     req.userTipo = decoded.tipo;
+    console.log('[verifyToken] Sucesso: Token verificado. UserID:', req.userId, 'Tipo:', req.userTipo);
     next();
   } catch (err) {
-    res.status(401).json({ error: 'Token inválido' });
+    console.error('[verifyToken] Falha na verificação do JWT:', err.message);
+    // Adiciona mais detalhes do erro ao log e à resposta, se for um erro conhecido do JWT
+    let errorDetail = err.message;
+    if (err.name === 'TokenExpiredError') {
+      errorDetail = 'Token expirado.';
+    } else if (err.name === 'JsonWebTokenError') {
+      errorDetail = 'Token inválido (problema na assinatura ou malformado).';
+    }
+    res.status(401).json({ error: 'Token inválido ou expirado.', details: errorDetail });
   }
 };
 

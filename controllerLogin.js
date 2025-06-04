@@ -105,8 +105,9 @@ const clientService = {
       console.log('Timestamp (getTime):', dataAtualServidor.getTime());
       console.log('--- FIM DEBUG DATA/HORA ---');
 
+      console.log('[logarUsuario] JWT_SECRET em uso para assinatura:', process.env.JWT_SECRET); // Log da SECRET_KEY usada para assinar
       // Linha original de criação do token (deve vir depois dos logs)
-      const token = jwt.sign({ id: user.id, tipo: tipo }, SECRET_KEY, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.id, tipo: tipo }, SECRET_KEY, { expiresIn: '1h' }); // SECRET_KEY é process.env.JWT_SECRET
       console.log('Login bem-sucedido, token gerado para usuário:', user.id);
 
       await connection.execute(
