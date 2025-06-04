@@ -60,7 +60,8 @@ app.use(
         "https://accessibility-widget.pages.dev",
         "'sha256-Pm3v7w2K3NW064ZpDut6RgIT+c34UZKAlVK7vzBRQpE='",
         "https://vlibras.gov.br",
-        "https://cdn.jsdelivr.net" // <<< ADICIONADO
+        "https://cdn.jsdelivr.net",
+        "https://www.vlibras.gov.br" // <<< ADICIONADO
       ],
       scriptSrcElem: [ // Garantindo que esta diretiva esteja presente
         "'self'",
@@ -68,7 +69,8 @@ app.use(
         "https://accessibility-widget.pages.dev",
         "'sha256-Pm3v7w2K3NW064ZpDut6RgIT+c34UZKAlVK7vzBRQpE='",
         "https://vlibras.gov.br",
-        "https://cdn.jsdelivr.net" // <<< ADICIONADO
+        "https://cdn.jsdelivr.net",
+        "https://www.vlibras.gov.br" // <<< ADICIONADO
       ],
       styleSrc: [
         "'self'",
@@ -82,7 +84,10 @@ app.use(
       imgSrc: [
         "'self'",
         "data:",
-        "https://vlibras.gov.br" // <<< ADICIONADO
+        "https://vlibras.gov.br",    // Já estava
+        "https://www.vlibras.gov.br", // <<< ADICIONADO
+        "https://vlibras.gov.br/",   // <<< ADICIONADO
+        "https://www.vlibras.gov.br/"  // <<< ADICIONADO
       ],
       connectSrc: [
         "'self'"
