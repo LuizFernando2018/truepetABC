@@ -56,12 +56,12 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
-        "https.ajax.googleapis.com",
+        "https://ajax.googleapis.com", // CORRIGIDO AQUI
         "https://accessibility-widget.pages.dev"
       ],
       scriptSrcElem: [ // Garantindo que esta diretiva esteja presente
         "'self'",
-        "https.ajax.googleapis.com",
+        "https://ajax.googleapis.com", // CORRIGIDO AQUI
         "https://accessibility-widget.pages.dev"
       ],
       styleSrc: [
