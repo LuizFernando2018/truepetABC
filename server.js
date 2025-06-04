@@ -14,6 +14,7 @@ import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
+import helmet from 'helmet';
 
 dotenv.config();
 
@@ -46,6 +47,45 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+app.use(helmet()); // Aplica padrões de segurança do Helmet
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "https.ajax.googleapis.com",        // Para jQuery em recuperarSenha.html (se ainda usado)
+        "https://accessibility-widget.pages.dev" // Para o widget de acessibilidade
+        // Adicione aqui outras origens de script se forem necessárias e confiáveis
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", // Temporariamente para estilos aplicados via JS (mensagens de erro/sucesso)
+        "https://fonts.googleapis.com" // Se usar Google Fonts
+        // Adicione aqui outras origens de estilo se forem necessárias e confiáveis
+      ],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com" // Para Google Fonts
+        // Adicione aqui outras origens de fontes se forem necessárias e confiáveis
+      ],
+      imgSrc: [
+        "'self'",
+        "data:" // Para imagens em data URI
+        // Adicione aqui outras origens de imagem se forem necessárias e confiáveis
+      ],
+      connectSrc: [
+        "'self'" // Permite fetch/XHR para o próprio domínio/backend
+        // Adicione aqui outras origens se o frontend fizer chamadas para outras APIs
+      ],
+      // frameSrc: ["'self'", "outra-origem-confiavel.com"], // Se você usar iframes
+      // objectSrc: ["'none'"], // Recomendado para desabilitar plugins como Flash
+      // upgradeInsecureRequests: [], // Se estiver em produção com HTTPS e quiser forçar HTTPS
+    },
+  })
+);
 
 app.use(express.json());
 app.use(cors({
