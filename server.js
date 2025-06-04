@@ -59,14 +59,16 @@ app.use(
         "https://ajax.googleapis.com", // CORRIGIDO AQUI
         "https://accessibility-widget.pages.dev",
         "'sha256-Pm3v7w2K3NW064ZpDut6RgIT+c34UZKAlVK7vzBRQpE='",
-        "https://vlibras.gov.br" // <<< ADICIONADO
+        "https://vlibras.gov.br",
+        "https://cdn.jsdelivr.net" // <<< ADICIONADO
       ],
       scriptSrcElem: [ // Garantindo que esta diretiva esteja presente
         "'self'",
         "https://ajax.googleapis.com", // CORRIGIDO AQUI
         "https://accessibility-widget.pages.dev",
         "'sha256-Pm3v7w2K3NW064ZpDut6RgIT+c34UZKAlVK7vzBRQpE='",
-        "https://vlibras.gov.br" // <<< ADICIONADO
+        "https://vlibras.gov.br",
+        "https://cdn.jsdelivr.net" // <<< ADICIONADO
       ],
       styleSrc: [
         "'self'",
