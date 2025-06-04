@@ -95,6 +95,17 @@ const clientService = {
 
       const tipo = user.tipo;
       console.log('Gerando token com tipo:', tipo);
+
+      // Logs para Debug de Data/Hora
+      console.log('--- DEBUG DATA/HORA em controllerLogin.js ---');
+      console.log('Valor de Date.now():', Date.now());
+      const dataAtualServidor = new Date();
+      console.log('Objeto new Date():', dataAtualServidor.toString());
+      console.log('Data UTC (toISOString):', dataAtualServidor.toISOString());
+      console.log('Timestamp (getTime):', dataAtualServidor.getTime());
+      console.log('--- FIM DEBUG DATA/HORA ---');
+
+      // Linha original de criação do token (deve vir depois dos logs)
       const token = jwt.sign({ id: user.id, tipo: tipo }, SECRET_KEY, { expiresIn: '1h' });
       console.log('Login bem-sucedido, token gerado para usuário:', user.id);
 
