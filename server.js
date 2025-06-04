@@ -56,33 +56,32 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
-        "https.ajax.googleapis.com",        // Para jQuery em recuperarSenha.html (se ainda usado)
-        "https://accessibility-widget.pages.dev" // Para o widget de acessibilidade
-        // Adicione aqui outras origens de script se forem necessárias e confiáveis
+        "https.ajax.googleapis.com",
+        "https://accessibility-widget.pages.dev"
+      ],
+      scriptSrcElem: [ // Garantindo que esta diretiva esteja presente
+        "'self'",
+        "https.ajax.googleapis.com",
+        "https://accessibility-widget.pages.dev"
       ],
       styleSrc: [
         "'self'",
-        "'unsafe-inline'", // Temporariamente para estilos aplicados via JS (mensagens de erro/sucesso)
-        "https://fonts.googleapis.com" // Se usar Google Fonts
-        // Adicione aqui outras origens de estilo se forem necessárias e confiáveis
+        "'unsafe-inline'",
+        "https://fonts.googleapis.com"
       ],
       fontSrc: [
         "'self'",
-        "https://fonts.gstatic.com" // Para Google Fonts
-        // Adicione aqui outras origens de fontes se forem necessárias e confiáveis
+        "https://fonts.gstatic.com"
       ],
       imgSrc: [
         "'self'",
-        "data:" // Para imagens em data URI
-        // Adicione aqui outras origens de imagem se forem necessárias e confiáveis
+        "data:"
       ],
       connectSrc: [
-        "'self'" // Permite fetch/XHR para o próprio domínio/backend
-        // Adicione aqui outras origens se o frontend fizer chamadas para outras APIs
+        "'self'"
       ],
-      // frameSrc: ["'self'", "outra-origem-confiavel.com"], // Se você usar iframes
-      // objectSrc: ["'none'"], // Recomendado para desabilitar plugins como Flash
-      // upgradeInsecureRequests: [], // Se estiver em produção com HTTPS e quiser forçar HTTPS
+      objectSrc: ["'none'"], // Recomendado: desabilita plugins como Flash
+      upgradeInsecureRequests: [], // Deixe vazio por enquanto, ative em produção com HTTPS
     },
   })
 );
