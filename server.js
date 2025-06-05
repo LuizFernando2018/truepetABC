@@ -98,7 +98,8 @@ app.use(
         "https://acessos.vlibras.gov.br",
         "https://dicionario2.vlibras.gov.br",
         "https://vlibras.gov.br",
-        "https://www.vlibras.gov.br"
+        "https://www.vlibras.gov.br",
+        "https://cdn.jsdelivr.net" // <<< ADICIONADO
       ],
       objectSrc: ["'none'"], // Recomendado: desabilita plugins como Flash
       upgradeInsecureRequests: [], // Deixe vazio por enquanto, ative em produção com HTTPS
