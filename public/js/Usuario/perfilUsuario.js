@@ -80,7 +80,7 @@ async function handleEnableTwoFactor(event) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json', // Embora não haja corpo, é uma boa prática
-        'Authorization': token
+        'Authorization': `Bearer ${token}`
       }
     });
 
@@ -121,7 +121,7 @@ async function handleDisableTwoFactor(event) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json', // Embora não haja corpo, é uma boa prática
-        'Authorization': token
+        'Authorization': `Bearer ${token}`
       }
     });
 
@@ -221,7 +221,7 @@ const exibeDados = async () => {
     const response = await fetch(`/perfil/${userIdFromToken}`, {
       method: 'GET',
       headers: {
-        'Authorization': token,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     });
