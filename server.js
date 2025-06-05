@@ -79,7 +79,10 @@ app.use(
       ],
       fontSrc: [
         "'self'",
-        "https://fonts.gstatic.com"
+        "https://fonts.gstatic.com", // Para Google Fonts, se usado
+        "https://vlibras.gov.br",
+        "https://www.vlibras.gov.br",
+        "https://cdn.jsdelivr.net"
       ],
       imgSrc: [
         "'self'",
@@ -91,7 +94,11 @@ app.use(
         "https://cdn.jsdelivr.net" // <<< ADICIONADO
       ],
       connectSrc: [
-        "'self'"
+        "'self'",
+        "https://acessos.vlibras.gov.br",
+        "https://dicionario2.vlibras.gov.br",
+        "https://vlibras.gov.br",
+        "https://www.vlibras.gov.br"
       ],
       objectSrc: ["'none'"], // Recomendado: desabilita plugins como Flash
       upgradeInsecureRequests: [], // Deixe vazio por enquanto, ative em produção com HTTPS
