@@ -14,7 +14,6 @@ import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
-import helmet from 'helmet';
 
 dotenv.config();
 
@@ -47,65 +46,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-
-app.use(helmet()); // Aplica padrões de segurança do Helmet
-
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "https://ajax.googleapis.com", // CORRIGIDO AQUI
-        "https://accessibility-widget.pages.dev",
-        "'sha256-Pm3v7w2K3NW064ZpDut6RgIT+c34UZKAlVK7vzBRQpE='",
-        "https://vlibras.gov.br",
-        "https://cdn.jsdelivr.net",
-        "https://www.vlibras.gov.br" // <<< ADICIONADO
-      ],
-      scriptSrcElem: [ // Garantindo que esta diretiva esteja presente
-        "'self'",
-        "https://ajax.googleapis.com", // CORRIGIDO AQUI
-        "https://accessibility-widget.pages.dev",
-        "'sha256-Pm3v7w2K3NW064ZpDut6RgIT+c34UZKAlVK7vzBRQpE='",
-        "https://vlibras.gov.br",
-        "https://cdn.jsdelivr.net",
-        "https://www.vlibras.gov.br" // <<< ADICIONADO
-      ],
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        "https://fonts.googleapis.com"
-      ],
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com", // Para Google Fonts, se usado
-        "https://vlibras.gov.br",
-        "https://www.vlibras.gov.br",
-        "https://cdn.jsdelivr.net"
-      ],
-      imgSrc: [
-        "'self'",
-        "data:",
-        "https://vlibras.gov.br",    // Já estava
-        "https://www.vlibras.gov.br", // <<< ADICIONADO
-        "https://vlibras.gov.br/",   // <<< ADICIONADO
-        "https://www.vlibras.gov.br/",  // <<< ADICIONADO
-        "https://cdn.jsdelivr.net" // <<< ADICIONADO
-      ],
-      connectSrc: [
-        "'self'",
-        "https://acessos.vlibras.gov.br",
-        "https://dicionario2.vlibras.gov.br",
-        "https://vlibras.gov.br",
-        "https://www.vlibras.gov.br",
-        "https://cdn.jsdelivr.net" // <<< ADICIONADO
-      ],
-      objectSrc: ["'none'"], // Recomendado: desabilita plugins como Flash
-      upgradeInsecureRequests: [], // Deixe vazio por enquanto, ative em produção com HTTPS
-    },
-  })
-);
 
 app.use(express.json());
 app.use(cors({
