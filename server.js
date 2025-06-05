@@ -87,7 +87,8 @@ app.use(
         "https://vlibras.gov.br",    // Já estava
         "https://www.vlibras.gov.br", // <<< ADICIONADO
         "https://vlibras.gov.br/",   // <<< ADICIONADO
-        "https://www.vlibras.gov.br/"  // <<< ADICIONADO
+        "https://www.vlibras.gov.br/",  // <<< ADICIONADO
+        "https://cdn.jsdelivr.net" // <<< ADICIONADO
       ],
       connectSrc: [
         "'self'"
