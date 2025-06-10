@@ -1,7 +1,39 @@
 import { validaCampo } from './validacao.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM da tela de login totalmente carregado');
+  // Bloco de verificação de token existente
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Opcional: Verificar expiração do token, embora o backend vá validar de qualquer forma.
+      // const currentTime = Math.floor(Date.now() / 1000);
+      // if (payload.exp && payload.exp < currentTime) {
+      //   console.log('Token expirado encontrado no localStorage, removendo.');
+      //   localStorage.removeItem('token');
+      //   localStorage.removeItem('userId');
+      //   // Prossegue para mostrar a página de login
+      // } else {
+        console.log('Usuário já logado, redirecionando...');
+        const tipoUsuario = payload.tipo;
+        if (tipoUsuario === 'ong') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'animais.html';
+        }
+        return; // Impede a execução do resto do script de login
+      // }
+    } catch (e) {
+      console.error('Erro ao decodificar token existente, removendo-o:', e);
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      // Prossegue para mostrar a página de login
+    }
+  }
+  // Fim do bloco de verificação
+
+  // O restante do código original do DOMContentLoaded continua aqui...
+  console.log('DOM da tela de login totalmente carregado'); // Este log agora só aparecerá se não houver token válido
 
   const formulario = document.querySelector('[data-formLogin]');
   if (!formulario) {

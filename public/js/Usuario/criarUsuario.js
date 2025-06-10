@@ -1,9 +1,41 @@
 import { validaCampo, validaConfirmaSenha } from './validacao.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM totalmente carregado');
+  // Bloco de verificação de token existente
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Opcional: Verificar expiração do token, embora o backend vá validar de qualquer forma.
+      // const currentTime = Math.floor(Date.now() / 1000);
+      // if (payload.exp && payload.exp < currentTime) {
+      //   console.log('Token expirado encontrado no localStorage, removendo.');
+      //   localStorage.removeItem('token');
+      //   localStorage.removeItem('userId');
+      //   // Prossegue para mostrar a página de cadastro
+      // } else {
+        console.log('Usuário já logado, redirecionando da página de cadastro...');
+        const tipoUsuario = payload.tipo;
+        if (tipoUsuario === 'ong') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'animais.html';
+        }
+        return; // Impede a execução do resto do script de cadastro
+      // }
+    } catch (e) {
+      console.error('Erro ao decodificar token existente na página de cadastro, removendo-o:', e);
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      // Prossegue para mostrar a página de cadastro
+    }
+  }
+  // Fim do bloco de verificação
 
-    const formulario = document.querySelector('[data-formCadastro]');
+  // O restante do código original do DOMContentLoaded continua aqui...
+  console.log('DOM totalmente carregado'); // Este log agora só aparecerá se não houver token válido
+
+  const formulario = document.querySelector('[data-formCadastro]');
     if (!formulario) {
         console.error('Erro: Formulário [data-formCadastro] não encontrado');
         alert('Erro: Formulário não encontrado. Verifique o HTML.');
